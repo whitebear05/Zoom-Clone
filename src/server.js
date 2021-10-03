@@ -18,8 +18,14 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
 wsServer.on("connection", (socket) => {
+  socket.onAny((event) => {
+    // 미들웨어 같은 존재
+    console.log(`Socket Event: ${event}`);
+  });
   socket.on("enter_room", (roomName, done) => {
-    console.log(roomName);
+    console.log(socket.rooms);
+    socket.join(roomName);
+    console.log(socket.rooms);
     done("Hello front!!");
   });
 });
