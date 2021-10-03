@@ -1,5 +1,5 @@
 import http from "http";
-import WebSocket from "ws";
+import SocketIO from "socket.io";
 import express from "express";
 
 const app = express();
@@ -12,31 +12,29 @@ app.get("/*", (_, res) => res.redirect("/"));
 
 const handleListen = () => console.log(`✅ Listening on http://localhost:3000`);
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-// http 서버 위에서 ws 서버가 작동하는 것. 둘 다 같은 포트 listen.
-// 항상 이렇게 같이 만들 필요 없고, ws 서버만 만들어도 된다.
+const httpServer = http.createServer(app);
+const wsServer = SocketIO(httpServer);
 
-const sockets = [];
+// const wss = new WebSocket.Server({ server });
+// const sockets = [];
+// wss.on("connection", (socket) => {
+//   sockets.push(socket);
+//   socket["nickname"] = "unknown";
+//   console.log("Connected to Browser ✅");
+//   socket.on("close", () => console.log("Disconnected from Browser ❎"));
+//   socket.on("message", (msg) => {
+//     const message = JSON.parse(msg);
+//     switch (message.type) {
+//       case "new_message":
+//         sockets.forEach((aSocket) =>
+//           aSocket.send(`⚪ ${socket.nickname}: ${message.payload}`)
+//         );
+//         break;
+//       case "nickname":
+//         socket["nickname"] = message.payload;
+//         break;
+//     }
+//   });
+// });
 
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "unknown";
-  console.log("Connected to Browser ✅");
-  socket.on("close", () => console.log("Disconnected from Browser ❎"));
-  socket.on("message", (msg) => {
-    const message = JSON.parse(msg);
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`⚪ ${socket.nickname}: ${message.payload}`)
-        );
-        break;
-      case "nickname":
-        socket["nickname"] = message.payload;
-        break;
-    }
-  });
-});
-
-server.listen(3000, handleListen);
+httpServer.listen(3000, handleListen);
