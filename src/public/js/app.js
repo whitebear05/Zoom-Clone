@@ -24,13 +24,17 @@ function showRoom() {
 function handleRoomSubmit(event) {
   event.preventDefault();
   const input = form.querySelector("input");
-  socket.emit("enter_room", { payload: input.value }, showRoom);
+  socket.emit("enter_room", input.value, showRoom);
   roomName = input.value;
   input.value = "";
 }
 
+form.addEventListener("submit", handleRoomSubmit);
+
 socket.on("welcome", () => {
-  addMessage("Someone joined!!");
+  addMessage("someone joined!");
 });
 
-form.addEventListener("submit", handleRoomSubmit);
+socket.on("bye", () => {
+  addMessage("someone left ㅠㅠ");
+});

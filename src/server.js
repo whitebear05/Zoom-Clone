@@ -22,10 +22,15 @@ wsServer.on("connection", (socket) => {
     // 미들웨어 같은 존재
     console.log(`Socket Event: ${event}`);
   });
-  socket.on("enter_room", (roomName, done) => {
+  socket.on("enter_room", ({ roomName }, done) => {
     socket.join(roomName);
     done();
     socket.to(roomName).emit("welcome");
+  });
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach((room) => {
+      socket.to(room).emit("bye");
+    });
   });
 });
 
